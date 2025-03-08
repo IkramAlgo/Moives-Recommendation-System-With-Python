@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ movie.title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white">
+    <div class="container mx-auto p-6">
+        <a href="/" class="text-red-400">⬅️ Back to Home</a>
+        <div class="flex flex-col md:flex-row mt-6">
+            <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" 
+                 class="rounded-lg w-full md:w-1/3" alt="{{ movie.title }}">
+            <div class="ml-6">
+                <h1 class="text-4xl font-bold">{{ movie.title }}</h1>
+                <p class="mt-2 text-gray-400">{{ movie.release_date[:4] }}</p>
+                <p class="mt-4">{{ movie.overview }}</p>
+
+                <h2 class="text-2xl font-bold mt-6">🔗 Watch on</h2>
+                <ul class="mt-2">
+                    {% if streaming_links %}
+                        {% for provider, url in streaming_links.items() %}
+                            <li><a href="{{ url }}" target="_blank" class="text-blue-400">{{ provider }}</a></li>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-gray-400">No streaming options available.</p>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

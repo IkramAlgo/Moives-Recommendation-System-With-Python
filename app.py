@@ -1,29 +1,72 @@
-from flask import Flask, request, render_template
-from data_loader import load_data
-from data_preprocessor import preprocess_data
-from movie_recommender import recommend_movies
 import os
+import requests
+from flask import Flask, render_template, request
+from dotenv import load_dotenv
+from scraper import scrape_justwatch  # Importing scraper function
 
-app = Flask(__name__, template_folder='templates')
+# Load API credentials from .env file
+env_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(dotenv_path=env_path)
 
-# Debugging: Print working directory
-print("Current Working Directory:", os.getcwd())
-print("Templates Path:", os.path.join(os.getcwd(), "templates"))
-print("Files in Templates Directory:", os.listdir("templates"))
+# Read API credentials
+TMDB_API_KEY = os.getenv("TMDB_API_KEY")
+TMDB_ACCESS_TOKEN = os.getenv("TMDB_ACCESS_TOKEN")
 
-# Load and preprocess data
-movies, ratings = load_data()
-data = preprocess_data(movies, ratings)
+if not TMDB_API_KEY:
+    raise ValueError("No TMDB API Key found. Please check your .env file.")
 
-@app.route('/')
+if not TMDB_ACCESS_TOKEN:
+    raise ValueError("No TMDB Access Token found. Please check your .env file.")
+
+app = Flask(__name__)
+
+# Function to fetch trending movies
+def get_trending_movies():
+    url = f"https://api.themoviedb.org/3/trending/movie/week?api_key={TMDB_API_KEY}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.json().get("results", [])
+    return []
+
+# Function to get movie details
+def get_movie_details(movie_id):
+    url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.json()
+    return {}
+
+# Function to search for a movie
+def search_movie(query):
+    url = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={query}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.json().get("results", [])
+    return []
+
+@app.route("/", methods=["GET", "POST"])
 def home():
-    return render_template('index.html')
+    trending_movies = get_trending_movies()
+    
+    if request.method == "POST":
+        movie_name = request.form.get("movie_name")
+        search_results = search_movie(movie_name)
+        return render_template("index.html", trending=trending_movies, search_results=search_results)
+    
+    return render_template("index.html", trending=trending_movies)
 
-@app.route('/recommend', methods=['POST'])
-def recommend():
-    movie_name = request.form['movie_name']
-    recommendations = recommend_movies(movie_name, movies, ratings)
-    return render_template('recommendations.html', recommendations=recommendations)
+@app.route('/movie/<int:movie_id>')
+def movie_details(movie_id):
+    movie = get_movie_details(movie_id)  # Fetch movie details
+    
+    if not movie:
+        return "Movie not found", 404
 
-if __name__ == '__main__':
+    # Extract movie title and fetch streaming links dynamically
+    movie_title = movie.get("title", "")
+    streaming_links = scrape_justwatch(movie_title) if movie_title else {}
+
+    return render_template("movie_details.html", movie=movie, streaming_links=streaming_links)
+
+if __name__ == "__main__":
     app.run(debug=True)

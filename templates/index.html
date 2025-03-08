@@ -1,6 +1,45 @@
-<html>
-<head><title>Home Page</title></head>
-<body>
-    <h1>Welcome to the Movie Recommendation App</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Finder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white">
+    <div class="container mx-auto p-6">
+        <h1 class="text-4xl font-bold mb-6 text-center">🎬 Movie Search</h1>
+        <form method="post" class="flex justify-center mb-6">
+            <input type="text" name="movie_name" placeholder="Enter movie name" required 
+                class="p-2 w-1/2 rounded-lg text-black">
+            <button type="submit" class="bg-red-500 text-white p-2 rounded-lg ml-2">Search</button>
+        </form>
+
+        {% if search_results %}
+            <h2 class="text-2xl font-bold mt-6">Search Results</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-4">
+                {% for movie in search_results %}
+                <a href="{{ url_for('movie_details', movie_id=movie.id) }}" 
+                   class="bg-gray-800 p-4 rounded-lg hover:bg-gray-700">
+                    <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" 
+                         class="rounded-lg" alt="{{ movie.title }}">
+                    <p class="mt-2 font-semibold">{{ movie.title }}</p>
+                </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <h2 class="text-2xl font-bold mt-6">🔥 Trending Movies</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-4">
+            {% for movie in trending %}
+            <a href="{{ url_for('movie_details', movie_id=movie.id) }}" 
+               class="bg-gray-800 p-4 rounded-lg hover:bg-gray-700">
+                <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" 
+                     class="rounded-lg" alt="{{ movie.title }}">
+                <p class="mt-2 font-semibold">{{ movie.title }}</p>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
 </body>
 </html>
