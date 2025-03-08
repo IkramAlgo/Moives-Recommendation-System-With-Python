@@ -1,3 +1,4 @@
+''' 
 import pandas as pd
 import os
 
@@ -7,3 +8,6 @@ def load_data():
     movies = pd.read_csv(os.path.join(current_dir, 'data', 'movies.csv'))
     ratings = pd.read_csv(os.path.join(current_dir, 'data', 'ratings.csv'))
     return movies, ratings
+    
+
+'''
