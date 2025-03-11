@@ -5,74 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movie Finder</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Add custom animations -->
-    <style>
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .fade-in {
-            animation: fadeIn 1s ease-in-out;
-        }
-    </style>
 </head>
 <body class="bg-gray-900 text-white">
-    <div class="container mx-auto p-6 fade-in">
-        <!-- Hero Section -->
-        <div class="hero bg-gray-800 rounded-lg p-8 mb-8 text-center">
-            <h1 class="text-5xl font-bold mb-4">🎬 Discover Your Next Favorite Movie</h1>
-            <p class="text-xl mb-6">Search for movies, explore trending picks, and find where to watch them.</p>
-            <form method="post" class="flex justify-center">
-                <input type="text" name="movie_name" placeholder="Enter movie name" required 
-                    class="p-3 w-1/2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-red-500">
-                <button type="submit" class="bg-red-500 text-white p-3 rounded-lg ml-2 hover:bg-red-600 transition-colors">
-                    Search
-                </button>
-            </form>
+    <!-- Navigation Bar -->
+    <nav class="bg-gray-800 p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="{{ url_for('home') }}" class="text-2xl font-bold">🎬 Movie Finder</a>
+            <div>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('logout') }}" class="bg-red-500 text-white px-4 py-2 rounded-lg">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="bg-blue-500 text-white px-4 py-2 rounded-lg mr-2">Login</a>
+                    <a href="{{ url_for('register') }}" class="bg-green-500 text-white px-4 py-2 rounded-lg">Register</a>
+                {% endif %}
+            </div>
         </div>
+    </nav>
 
-        <!-- Search Results -->
+    <div class="container mx-auto p-6">
+        <h1 class="text-4xl font-bold mb-6 text-center">🎬 Movie Search</h1>
+        <form method="post" class="flex justify-center mb-6">
+            <input type="text" name="movie_name" placeholder="Enter movie name" required 
+                class="p-2 w-1/2 rounded-lg text-black">
+            <button type="submit" class="bg-red-500 text-white p-2 rounded-lg ml-2">Search</button>
+        </form>
+
         {% if search_results %}
             <h2 class="text-2xl font-bold mt-6">Search Results</h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-4">
                 {% for movie in search_results %}
                 <a href="{{ url_for('movie_details', movie_id=movie.id) }}" 
-                   class="bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transform hover:scale-105 transition-transform">
+                   class="bg-gray-800 p-4 rounded-lg hover:bg-gray-700">
                     <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" 
-                         class="rounded-lg w-full h-64 object-cover" alt="{{ movie.title }}">
+                         class="rounded-lg" alt="{{ movie.title }}">
                     <p class="mt-2 font-semibold">{{ movie.title }}</p>
-                    <p class="text-sm text-gray-400">{{ movie.release_date[:4] }}</p>
                 </a>
                 {% endfor %}
             </div>
         {% endif %}
 
-        <!-- Trending Movies -->
         <h2 class="text-2xl font-bold mt-6">🔥 Trending Movies</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-4">
             {% for movie in trending %}
             <a href="{{ url_for('movie_details', movie_id=movie.id) }}" 
-               class="bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transform hover:scale-105 transition-transform">
+               class="bg-gray-800 p-4 rounded-lg hover:bg-gray-700">
                 <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" 
-                     class="rounded-lg w-full h-64 object-cover" alt="{{ movie.title }}">
+                     class="rounded-lg" alt="{{ movie.title }}">
                 <p class="mt-2 font-semibold">{{ movie.title }}</p>
-                <p class="text-sm text-gray-400">{{ movie.release_date[:4] }}</p>
             </a>
             {% endfor %}
-        </div>
-
-        <!-- Watch on Section -->
-        <h2 class="text-2xl font-bold mt-6">📺 Watch on</h2>
-        <div class="mt-4 flex space-x-4">
-            <a href="{{ movie_links['IMDb'] }}" target="_blank" class="text-yellow-400 hover:text-yellow-500 transition-colors">
-                IMDb
-            </a>
-            <a href="{{ movie_links['TMDB'] }}" target="_blank" class="text-blue-400 hover:text-blue-500 transition-colors">
-                TMDB
-            </a>
-            <a href="{{ movie_links['JustWatch'] }}" target="_blank" class="text-green-400 hover:text-green-500 transition-colors">
-                JustWatch
-            </a>
         </div>
     </div>
 </body>
