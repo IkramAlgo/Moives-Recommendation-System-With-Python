@@ -5,16 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ movie.title }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Add custom animations -->
     <style>
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .fade-in {
-            animation: fadeIn 1s ease-in-out;
-        }
-        .hero {
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .fade-in { animation: fadeIn 1s ease-in-out; }
+        .hero { 
             background-image: url('https://image.tmdb.org/t/p/w1280{{ movie.backdrop_path }}');
             background-size: cover;
             background-position: center;
@@ -26,7 +20,7 @@
     <div class="hero h-96 flex items-end p-8 relative">
         <div class="absolute inset-0 bg-black bg-opacity-70"></div>
         <div class="relative z-10">
-            <a href="/" class="text-red-400 hover:text-red-500 transition-colors">⬅️ Back to Home</a>
+            <a href="/" class="text-red-400 hover:text-red-500">⬅️ Back to Home</a>
             <h1 class="text-5xl font-bold mt-4">{{ movie.title }}</h1>
             <p class="mt-2 text-gray-400">{{ movie.release_date[:4] }} | {{ movie.runtime }} mins</p>
         </div>
@@ -49,7 +43,9 @@
                     <h2 class="text-2xl font-bold">🎭 Genres</h2>
                     <div class="flex flex-wrap mt-2">
                         {% for genre in movie.genres %}
-                            <span class="bg-gray-800 text-white px-3 py-1 rounded-full mr-2 mb-2">{{ genre.name }}</span>
+                            <span class="bg-gray-800 text-white px-3 py-1 rounded-full mr-2 mb-2">
+                                {{ genre.name }}
+                            </span>
                         {% endfor %}
                     </div>
                 </div>
@@ -60,30 +56,45 @@
                     <p class="mt-2 text-gray-400">{{ movie.vote_average }}/10 ({{ movie.vote_count }} votes)</p>
                 </div>
 
-                <!-- Watch on Links -->
+                <!-- Streaming Links -->
                 <div class="mt-6">
                     <h2 class="text-2xl font-bold">📺 Watch on</h2>
                     <ul class="mt-2">
                         {% if movie_links %}
                             <li class="mb-2">
-                                <a href="{{ movie_links['IMDb'] }}" target="_blank" class="text-yellow-400 hover:text-yellow-500 transition-colors">
+                                <a href="{{ movie_links['IMDb'] }}" target="_blank" class="text-yellow-400 hover:text-yellow-500">
                                     IMDb
                                 </a>
                             </li>
                             <li class="mb-2">
-                                <a href="{{ movie_links['TMDB'] }}" target="_blank" class="text-blue-400 hover:text-blue-500 transition-colors">
-                                    TMDB
-                                </a>
-                            </li>
-                            <li class="mb-2">
-                                <a href="{{ movie_links['JustWatch'] }}" target="_blank" class="text-green-400 hover:text-green-500 transition-colors">
+                                <a href="{{ movie_links['JustWatch'] }}" target="_blank" class="text-green-400 hover:text-green-500">
                                     JustWatch
                                 </a>
                             </li>
+                            <li class="mb-2">
+                                <a href="{{ movie_links['TMDB'] }}" target="_blank" class="text-blue-400 hover:text-blue-500">
+                                    TMDB
+                                </a>
+                            </li>
                         {% else %}
-                            <p class="text-gray-400">No streaming options available.</p>
+                            <p class="text-gray-400">No streaming links available.</p>
                         {% endif %}
                     </ul>
+                </div>
+
+                <!-- Related Movie Recommendations -->
+                <div class="mt-6">
+                    <h2 class="text-2xl font-bold">🍿 Related Movies</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-4">
+                        {% for rec_movie in recommendations %}
+                            <a href="{{ url_for('movie_details', movie_id=rec_movie.id) }}" 
+                               class="bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transform hover:scale-105 transition-transform">
+                                <img src="https://image.tmdb.org/t/p/w500{{ rec_movie.poster_path }}" 
+                                     class="rounded-lg w-full h-64 object-cover" alt="{{ rec_movie.title }}">
+                                <p class="mt-2 font-semibold">{{ rec_movie.title }}</p>
+                            </a>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         </div>
